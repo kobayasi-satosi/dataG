@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+		 width="100%" height="100%"
+		 paddingBottom="5"
+		 paddingLeft="5"
+		 paddingTop="5"
+		 paddingRight="5"
+		 horizontalAlign="center" verticalAlign="middle"
+		 verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	
+	<mx:CheckBox id="chkBox" click="{data.checkbox = !data.checkbox}" selected="{data.checkbox}" />
+</mx:VBox>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" initialize="init()">
+	<mx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.ListCollectionView;
+			import mx.controls.CheckBox;
+			import mx.events.CollectionEvent;
+			import mx.events.DataGridEvent;
+			import mx.events.ListEvent;
+			[Bindable]
+			public var _headerRender:ClassFactory;
+			public var _selectAllFlag:Boolean;
+			
+			[Bindable]
+			private var _list:ArrayCollection = new ArrayCollection([
+				{	checkbox:false,	data1:"データ1-1",	data2:"データ2-1",	data3:"データ3-1"	},
+				{	checkbox:false,	data1:"データ1-2",	data2:"データ2-2",	data3:"データ3-2"	},
+				{	checkbox:false,	data1:"データ1-3",	data2:"データ2-3",	data3:"データ3-3"	},
+				{	checkbox:false,	data1:"データ1-4",	data2:"データ2-4",	data3:"データ3-4"	},
+				{	checkbox:false,	data1:"データ1-5",	data2:"データ2-5",	data3:"データ3-5"	},
+				{	checkbox:false,	data1:"データ1-6",	data2:"データ2-6",	data3:"データ3-6"	},
+			])
+			
+			private function init():void {
+				this.btnDisp.enabled = false;
+				_headerRender = new ClassFactory(CheckBoxHeaderRenderer);
+				_headerRender.properties = { stateHost: this, stateProperty: "_selectAllFlag" };
+				this._list.addEventListener(CollectionEvent.COLLECTION_CHANGE, dgItemClickHandler);
+				this.dgrList.addEventListener(ListEvent.ITEM_CLICK, dgItemClickHandler);
+				
+			}
+			
+			private function dgItemClickHandler(event:Event):void{
+				this.btnDisp.enabled = false;
+				for each (var target:Object in _list ){	
+					if(target.checkbox as Boolean){
+						this.btnDisp.enabled = true;
+						break;
+					}
+				}
+			}
+			
+			private function onBtnDispData():void {
+				var selectnum:int = 0;
+				
+				txtBindData.text = "＜選択行＞" + "\n" + "\n";
+				for(var i:int = 0; i < _list.length; i++){
+					if(_list[i].checkbox){
+						txtBindData.text += "行番号：" + (i+1) + "\t";
+						txtBindData.text += "data1：" + _list[i].data1 + "\t";
+						txtBindData.text += "data2：" + _list[i].data2 + "\t";
+						txtBindData.text += "data3：" + _list[i].data3 + "\n";
+						selectnum++;
+					}
+				}
+				txtBindData.text += "\n" + "選択行数：" + selectnum + "\n";
+			}
+			
+			/**
+			 * DataGrid Itemクリック イベント
+			 */
+			public function onDgrListClick(event:MouseEvent):void{
+				if( event.target is CheckBoxHeaderRenderer ){
+					// データグリッド CheckBoxHeader クリック時
+					for(var i:int = 0; i < _list.length; i++){
+						// 全チェックボックスの値を_selectAllFlagと同じ値に変更する
+						_list[i].checkbox = CheckBoxHeaderRenderer(event.target).selected;
+						ListCollectionView(dgrList.dataProvider).itemUpdated(_list, "checkbox");
+					}
+					//					this.buttonControll();
+				}
+			}
+		]]>
+	</mx:Script>
+	
+	<mx:Spacer width="100%" />
+	<mx:VBox backgroundColor="#FFFFFF">
+		<mx:Label text="DataGrid Header内にチェックボックス配置" fontSize="14"
+				  color="#FF0000" fontWeight="bold"/>
+		<mx:DataGrid id="dgrList" dataProvider="{_list}" rowCount="4"
+					 click="{onDgrListClick(event)}">
+			<mx:columns>
+				<mx:DataGridColumn headerText="選択" width="50" dataField="checkbox"
+								   sortable="false" textAlign="center"
+								   itemRenderer="CheckBoxRenderer"
+								   headerRenderer="{_headerRender}"/>
+				<mx:DataGridColumn headerText="データ1" width="100" dataField="data1" />
+				<mx:DataGridColumn headerText="データ2" width="100" dataField="data2" />
+				<mx:DataGridColumn headerText="データ3" width="100" dataField="data3" />
+			</mx:columns>
+		</mx:DataGrid>
+		<mx:Button id="btnDisp" label="表示" click="{onBtnDispData()}" />
+		<mx:TextArea id="txtBindData" width="350" height="200" editable="false" />
+	</mx:VBox>
+	<mx:Spacer width="100%" />
+</mx:WindowedApplication>
